@@ -85,7 +85,7 @@ io.sockets.on('connection', function (socket) {
 
         uploader.on('end', function() {
           console.log("done uploading");
-          image_path = 'https://s3.amazonaws.com/com.rbowers.picam/'+aws_path;
+          image_path = 'http://s3.amazonaws.com/com.rbowers.brandbase/'+aws_path;
           socket.emit("returnPhoto", { img: image_path });
         });
       }

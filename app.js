@@ -45,14 +45,15 @@ io.sockets.on('connection', function (socket) {
   // If we recieved a command from a client to start watering lets do so
   socket.on('snapPhoto', function(data) {
 
-    var aws_path = 'pic-' + Date.now() + '.jpg',
+    var aws_path = 'media/pic-' + Date.now() + '.jpg',
         cmd = 'raspistill -o ' + aws_path,
         image_path = '',
         params = {
           localFile: aws_path,
           s3Params: {
-            Bucket: "com.rbowers.brandbase",
+            Bucket: "com.rbowers.picam",
             Key: aws_path,
+            ACL: 'public-read'
             // other options supported by putObject, except Body and ContentLength.
             // See: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property
           }
@@ -85,7 +86,7 @@ io.sockets.on('connection', function (socket) {
 
         uploader.on('end', function() {
           console.log("done uploading");
-          image_path = 'http://s3.amazonaws.com/com.rbowers.brandbase/'+aws_path;
+          image_path = 'http://s3.amazonaws.com/com.rbowers.picam/'+aws_path;
           socket.emit("returnPhoto", { img: image_path });
         });
       }

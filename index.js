@@ -1,6 +1,6 @@
 var exec = require('child_process').exec;
 
-var image_path = './pic-' + Date.now() + '.jpg';
+var image_path = './media/pic-' + Date.now() + '.jpg';
 
 var cmd = 'raspivid -o ' + image_path + '';
 

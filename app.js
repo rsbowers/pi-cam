@@ -42,6 +42,8 @@ app.get('/', function (req, res) {
 // Web Socket Connection
 io.sockets.on('connection', function (socket) {
 
+  console.log('connected');
+
   // If we recieved a command from a client to start watering lets do so
   socket.on('snapPhoto', function(data) {
 

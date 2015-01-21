@@ -51,6 +51,7 @@ app.get('/snap', function (req, res) {
       var uploader = client.uploadFile(params);
       uploader.on('error', function(err) {
         console.error("unable to upload:", err.stack);
+        res.send("unable to upload:", err.stack)
       });
       uploader.on('progress', function() {
         console.log("progress", uploader.progressMd5Amount,
@@ -59,15 +60,13 @@ app.get('/snap', function (req, res) {
       uploader.on('end', function() {
         image_path = aws_path;
         success = true;
+        res.render('snap', {
+          image: image_path,
+          showLink: success
+        });
         console.log("done uploading");
       });
     }
-  });
-
-  showLink = true;
-  res.render('snap', {
-    image: image_path,
-    showLink: success
   });
 });
 

@@ -45,6 +45,8 @@ io.sockets.on('connection', function (socket) {
   // If we recieved a command from a client to start watering lets do so
   socket.on('snapPhoto', function(data) {
 
+    console.log('server snapPhoto');
+
     var aws_path = 'media/pic-' + Date.now() + '.jpg',
         cmd = 'raspistill -o ' + aws_path,
         image_path = '',

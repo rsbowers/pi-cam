@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "devDependencies": {},
   "dependencies": {
-    "twilio": "^1.10.0"
+    "twilio": "^1.10.0",
+    "s3": "^4.3.1"
   }
 }

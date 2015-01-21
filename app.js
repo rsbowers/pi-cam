@@ -1,7 +1,9 @@
-var express = require('express');
-var exphbs  = require('express3-handlebars');
-var exec = require('child_process').exec;
-var s3 = require('s3');
+var express = require('express'),
+exphbs  = require('express3-handlebars'),
+path = require('path'),
+exec = require('child_process').exec,
+s3 = require('s3'),
+http = require('http');
 
 var client = s3.createClient({
   maxAsyncS3: 20,     // this is the default
@@ -18,9 +20,20 @@ var client = s3.createClient({
 });
 
 var app = express();
+var server = app.listen(3000, function () {
+
+  var host = server.address().address
+  var port = server.address().port
+
+  console.log('Example app listening at http://%s:%s', host, port)
+
+});
+
+var io = require('socket.io').listen(server);
 
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', function (req, res) {
   res.render('home');
@@ -58,7 +71,7 @@ app.get('/snap', function (req, res) {
         uploader.progressAmount, uploader.progressTotal);
       });
       uploader.on('end', function() {
-        image_path = aws_path;
+        image_path = 'https://s3.amazonaws.com/com.rbowers.picam/'+aws_path;
         success = true;
         res.render('snap', {
           image: image_path,
@@ -70,11 +83,20 @@ app.get('/snap', function (req, res) {
   });
 });
 
-var server = app.listen(3000, function () {
+// Web Socket Connection
+io.sockets.on('connection', function (socket) {
 
-  var host = server.address().address
-  var port = server.address().port
+  // If we recieved a command from a client to start watering lets do so
+  socket.on('snapPhoto', function(data) {
+    console.log("snapPhoto");
 
-  console.log('Example app listening at http://%s:%s', host, port)
+    delay = data["duration"];
 
-})
+    // Set a timer for when we should stop watering
+    setTimeout(function(){
+      socket.emit("returnPhoto");
+    }, delay*1000);
+
+  });
+
+});

@@ -39,63 +39,57 @@ app.get('/', function (req, res) {
   res.render('home');
 });
 
-app.get('/snap', function (req, res) {
-  var image_path = '';
-  var success = false;
-
-  var aws_path = 'media/pic-' + Date.now() + '.jpg',
-  cmd = 'raspistill -o ' + aws_path;
-
-  exec(cmd, function(error, stdout, stderr) {
-    // output is in stdout
-    if(error) {
-      console.log('Error : ', error);
-    } else {
-      console.log('Image Saved @ : ', image_path);
-      var params = {
-        localFile: aws_path,
-        s3Params: {
-          Bucket: "com.rbowers.picam",
-          Key: aws_path,
-          // other options supported by putObject, except Body and ContentLength.
-          // See: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property
-        },
-      };
-      var uploader = client.uploadFile(params);
-      uploader.on('error', function(err) {
-        console.error("unable to upload:", err.stack);
-        res.send("unable to upload:", err.stack)
-      });
-      uploader.on('progress', function() {
-        console.log("progress", uploader.progressMd5Amount,
-        uploader.progressAmount, uploader.progressTotal);
-      });
-      uploader.on('end', function() {
-        image_path = 'https://s3.amazonaws.com/com.rbowers.picam/'+aws_path;
-        success = true;
-        res.render('snap', {
-          image: image_path,
-          showLink: success
-        });
-        console.log("done uploading");
-      });
-    }
-  });
-});
-
 // Web Socket Connection
 io.sockets.on('connection', function (socket) {
 
   // If we recieved a command from a client to start watering lets do so
   socket.on('snapPhoto', function(data) {
-    console.log("snapPhoto");
 
-    delay = data["duration"];
+    var aws_path = 'media/pic-' + Date.now() + '.jpg',
+        cmd = 'raspistill -o ' + aws_path,
+        image_path = '',
+        params = {
+          localFile: aws_path,
+          s3Params: {
+            Bucket: "com.rbowers.picam",
+            Key: aws_path,
+            // other options supported by putObject, except Body and ContentLength.
+            // See: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property
+          }
+        },
+        errorMessage = '';
 
-    // Set a timer for when we should stop watering
-    setTimeout(function(){
-      socket.emit("returnPhoto");
-    }, delay*1000);
+    exec(cmd, function(error, stdout, stderr) {
+      // output is in stdout
+      if(error) {
+
+        console.log('Error : ', error);
+
+      } else {
+
+        console.log('Image Saved @ : ', image_path);
+
+        //Send to AWS
+        var uploader = client.uploadFile(params);
+
+        uploader.on('error', function(err) {
+          console.error("unable to upload:", err.stack);
+          errorMessage = "unable to upload:" + err.stack;
+          socket.emit("returnPhotoError", { err: errorMessage });
+        });
+
+        uploader.on('progress', function() {
+          console.log("progress", uploader.progressMd5Amount,
+          uploader.progressAmount, uploader.progressTotal);
+        });
+
+        uploader.on('end', function() {
+          console.log("done uploading");
+          image_path = 'https://s3.amazonaws.com/com.rbowers.picam/'+aws_path;
+          socket.emit("returnPhoto", { img: image_path });
+        });
+      }
+    });
 
   });
 

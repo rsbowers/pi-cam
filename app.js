@@ -45,12 +45,11 @@ io.sockets.on('connection', function (socket) {
   // If we recieved a command from a client to start watering lets do so
   socket.on('snapPhoto', function(data) {
 
-    var server_path = 'media/pic-' + Date.now() + '.jpg',
-        aws_path = 'pic-' + Date.now() + '.jpg',
+    var aws_path = 'media/pic-' + Date.now() + '.jpg',
         cmd = 'raspistill -o ' + aws_path,
         image_path = '',
         params = {
-          localFile: server_path,
+          localFile: aws_path,
           s3Params: {
             Bucket: "com.rbowers.picam",
             Key: aws_path,

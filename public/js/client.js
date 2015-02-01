@@ -1,4 +1,4 @@
-var socket = io.connect('http://10.213.60.43:3000/');
+var socket = io.connect('http://10.0.0.36:3000/');
 
 socket.on('returnPhotoEror', function (data) {
   console.log("returnPhotoEror");

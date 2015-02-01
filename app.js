@@ -3,7 +3,8 @@ exphbs  = require('express3-handlebars'),
 path = require('path'),
 exec = require('child_process').exec,
 s3 = require('s3'),
-http = require('http');
+http = require('http'),
+config = require('config/development');
 
 var client = s3.createClient({
   maxAsyncS3: 20,     // this is the default
@@ -12,8 +13,8 @@ var client = s3.createClient({
   multipartUploadThreshold: 20971520, // this is the default (20 MB)
   multipartUploadSize: 15728640, // this is the default (15 MB)
   s3Options: {
-    accessKeyId: "AKIAJIBDGALJRXD7WNDA",
-    secretAccessKey: "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",
+    accessKeyId: config.aws.accessKeyId,
+    secretAccessKey: config.aws.secretAccessKey
     // any other options are passed to new AWS.S3()
     // See: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property
   },

@@ -11,3 +11,5 @@ bower_components
 app/templates/pages/.aem
 tmp/*
 Gemfile
+config
+config/*.js

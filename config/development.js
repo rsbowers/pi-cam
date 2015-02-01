@@ -4,7 +4,7 @@
 // ==================================
 module.exports = {
 	aws: {
-		accessKeyId: "",
-		secretAccessKey: ""
+		accessKeyId: "AKIAJIBDGALJRXD7WNDA",
+		secretAccessKey: "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"
 	}
 };

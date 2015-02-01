@@ -4,7 +4,7 @@ path = require('path'),
 exec = require('child_process').exec,
 s3 = require('s3'),
 http = require('http'),
-config = require('config/development');
+config = require('./config/development');
 
 var client = s3.createClient({
 	maxAsyncS3: 20,     // this is the default

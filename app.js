@@ -93,6 +93,36 @@ io.sockets.on('connection', function (socket) {
 					console.log("done uploading");
 					image_path = 'http://s3.amazonaws.com/com.rbowers.picam/'+aws_path;
 					socket.emit("returnPhoto", { img: image_path });
+
+					var querystring = require('querystring');
+
+					var data = querystring.stringify({
+						name: aws_path,
+						url: image_path,
+						email: 'rbowers@sapient.com'
+					});
+
+					var options = {
+							host: 'obscure-peak-8029.herokuapp.com',
+							port: 80,
+							path: '/api/whiteboards',
+							method: 'POST',
+							headers: {
+									'Content-Type': 'application/x-www-form-urlencoded',
+									'Content-Length': Buffer.byteLength(data)
+							}
+					};
+
+					var req = http.request(options, function(res) {
+							res.setEncoding('utf8');
+							res.on('data', function (chunk) {
+									console.log("body: " + chunk);
+							});
+					});
+
+					req.write(data);
+					req.end();
+
 				});
 			}
 		});
